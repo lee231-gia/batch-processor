@@ -1,3 +1,8 @@
 node_modules/
 dist/
 .DS_Store
+*.log
+accuracy-report.json
+dir-process-report.json
+test_output.txt
+test_error.txt
