@@ -47,6 +47,8 @@ function createWindow() {
 }
 
 app.disableHardwareAcceleration();
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('disable-gpu');
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
