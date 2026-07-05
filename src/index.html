@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch Processor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <header>
+      <div class="logo">◉ Batch Processor</div>
+      <div class="header-controls">
+        <select id="langSelect" title="Language">
+          <option value="eng">English</option>
+          <option value="fra">French</option>
+          <option value="deu">German</option>
+          <option value="spa">Spanish</option>
+          <option value="ita">Italian</option>
+          <option value="por">Portuguese</option>
+          <option value="rus">Russian</option>
+          <option value="jpn">Japanese</option>
+          <option value="kor">Korean</option>
+          <option value="chi_sim">Chinese (Simplified)</option>
+          <option value="ara">Arabic</option>
+          <option value="hin">Hindi</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme">🌙</button>
+        <button id="settingsBtn" class="icon-btn" title="Settings">⚙</button>
+      </div>
+    </header>
+
+    <div id="toolbar" class="toolbar">
+      <button id="addFilesBtn" class="toolbar-btn" title="Add files">📁 <span class="tb-label">Add Files</span></button>
+      <button id="addFolderBtn" class="toolbar-btn" title="Add folder">📂 <span class="tb-label">Folder</span></button>
+      <div class="tb-sep"></div>
+      <button id="clipboardBtn" class="toolbar-btn" title="Paste from clipboard">📋 <span class="tb-label">Clipboard</span></button>
+      <button id="cameraBtn" class="toolbar-btn" title="Capture from camera">📷 <span class="tb-label">Camera</span></button>
+      <div class="tb-sep"></div>
+      <button id="toolbarUrlBtn" class="toolbar-btn" title="Add URL or text">🔗 <span class="tb-label">URL</span></button>
+      <div class="tb-sep"></div>
+      <button id="startBtn" class="toolbar-btn primary" disabled>▶ <span class="tb-label">Start</span></button>
+      <div class="tb-spacer"></div>
+      <button id="pauseBtn" class="toolbar-btn" disabled>⏸ <span class="tb-label">Pause</span></button>
+      <button id="clearBtn" class="toolbar-btn danger">🗑 <span class="tb-label">Clear</span></button>
+      <div class="tb-sep"></div>
+      <span id="selectCount" class="select-count hidden"></span>
+       <button id="copySelectedBtn" class="toolbar-btn hidden" title="Copy selected">📋 <span class="tb-label">Copy Sel</span></button>
+      <button id="testBtn" class="toolbar-btn" title="Run accuracy test">🧪 <span class="tb-label">Test</span></button>
+      <div class="tb-sep"></div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search queue..." spellcheck="false">
+      <select id="filterSelect" class="filter-select">
+        <option value="all">All</option>
+        <option value="queued">Queued</option>
+        <option value="processing">Running</option>
+        <option value="done">Completed</option>
+        <option value="error">Failed</option>
+        <option value="img">Images</option>
+        <option value="audio">Audio</option>
+        <option value="video">Video</option>
+        <option value="text">Text</option>
+        <option value="link">URLs</option>
+      </select>
+    </div>
+
+    <div id="mainArea" class="main-area">
+
+      <!-- LEFT PANEL: Queue -->
+      <div id="leftPanel" class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Queue</span>
+          <div class="panel-header-actions">
+            <span id="fileCount" class="panel-badge">0 files</span>
+            <span id="doneCount" class="panel-badge dim">0 done</span>
+            <span id="queueErrors" class="panel-badge error hidden"></span>
+          </div>
+        </div>
+        <div id="dropZone" class="drop-zone mini-drop">
+          <div class="drop-content">
+            <div class="drop-icon">⤓</div>
+            <p class="drop-title">Drag & drop here</p>
+            <p class="drop-sub">or click to browse</p>
+          </div>
+          <input type="file" id="fileInput" multiple accept="image/*,audio/*,video/*" hidden>
+        </div>
+        <div id="queueSection" class="queue-section">
+          <div id="fileList" class="file-list"></div>
+        </div>
+        <div id="queueStats" class="queue-stats-bar hidden">
+          <span id="queueProgressText"></span>
+        </div>
+      </div>
+
+      <div id="leftResize" class="resize-handle"></div>
+
+      <!-- CENTER PANEL: Preview -->
+      <div id="centerPanel" class="panel hidden">
+        <div class="panel-header">
+          <div id="previewTabs" class="preview-tabs">
+            <button class="preview-tab active" data-tab="text">OCR</button>
+            <button class="preview-tab" data-tab="original">Original</button>
+            <button class="preview-tab" data-tab="corrected">Corrected</button>
+            <button class="preview-tab" data-tab="metadata">Metadata</button>
+            <button class="preview-tab" data-tab="pipeline">Pipeline</button>
+            <button class="preview-tab" data-tab="log">Log</button>
+          </div>
+          <div class="panel-header-actions">
+            <span id="previewFileName" class="preview-filename"></span>
+            <button id="previewCloseBtn" class="icon-btn" title="Close preview">✕</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <textarea id="previewContent" class="preview-text" readonly spellcheck="false" wrap="off"></textarea>
+          <div id="previewMetadata" class="preview-meta hidden"></div>
+          <div id="previewPipeline" class="preview-pipeline hidden"></div>
+          <div id="previewLog" class="preview-log hidden"></div>
+          <div id="previewOriginal" class="preview-original hidden"></div>
+          <div id="previewCorrected" class="preview-corrected hidden"></div>
+        </div>
+      </div>
+
+      <div id="centerResize" class="resize-handle"></div>
+
+      <!-- RIGHT PANEL: Output -->
+      <div id="rightPanel" class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Output</span>
+          <div class="panel-header-actions">
+            <input type="text" id="outputSearch" class="search-input output-search" placeholder="Search in output..." spellcheck="false">
+          </div>
+        </div>
+        <div class="panel-body output-body">
+          <textarea id="outputText" class="output-text" readonly spellcheck="false" wrap="off" placeholder="Processed text will appear here..."></textarea>
+        </div>
+        <div id="exportSection" class="export-section">
+          <div class="export-row">
+            <select id="layoutMode">
+              <option value="formatted">Formatted</option>
+              <option value="markdown">Markdown</option>
+              <option value="raw">Raw</option>
+            </select>
+            <select id="exportFormat">
+              <option value="zip">ZIP</option>
+              <option value="merged-txt">TXT</option>
+              <option value="merged-md">Markdown</option>
+              <option value="csv">CSV</option>
+              <option value="pdf">PDF</option>
+              <option value="docx">DOCX</option>
+            </select>
+          </div>
+          <div class="export-row">
+            <button id="exportBtn" class="btn primary" style="flex:1">📦 Export</button>
+            <button id="copyBtn" class="btn" style="flex:1">📋 Copy All</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="statusBar" class="status-bar">
+      <span id="statusText" class="status-text">Ready</span>
+      <span id="statusProgress" class="status-progress hidden"></span>
+      <span id="statusTime" class="status-item hidden"></span>
+      <span id="statusSpeed" class="status-item hidden"></span>
+      <span id="statusErrors" class="status-item error hidden"></span>
+    </div>
+
+  </div>
+
+  <div id="urlInputBar" class="floating-bar hidden">
+    <span class="floating-bar-title">Add URL or Text</span>
+    <input type="text" id="urlInput" placeholder="Paste a URL or type text..." spellcheck="false">
+    <button id="urlAddBtn" class="btn primary">Add</button>
+    <button id="urlCloseBtn" class="icon-btn">✕</button>
+  </div>
+
+  <div id="contextMenu" class="context-menu hidden"></div>
+
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button id="settingsClose" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body">
+      <label class="setting"><input type="checkbox" id="mergeAll"><span>Merge all into one file</span></label>
+      <label class="setting"><input type="checkbox" id="genPdf"><span>Generate searchable PDF</span></label>
+      <label class="setting"><input type="checkbox" id="genDocx"><span>Generate DOCX</span></label>
+      <div class="setting"><span>Video mode:</span><select id="videoMode"><option value="sync-separate">Sync-separate</option><option value="merged">Merged</option></select></div>
+      <div class="setting"><span>Max workers:</span><select id="maxWorkers"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option></select></div>
+    </div>
+  </div>
+
+  <script src="lib/export.js"></script>
+  <script src="lib/structure-preserver.js"></script>
+  <script src="processors/ocr-processor.js"></script>
+  <script src="processors/audio-processor.js"></script>
+  <script src="processors/video-processor.js"></script>
+  <script src="test-runner.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

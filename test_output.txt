@@ -1,0 +1,6 @@
+
+=== ACCURACY TEST COMPLETE ===
+Average Word Accuracy: 86.6%
+Average Char Accuracy: 93.7%
+Passed: 17/21
+Report saved to: C:\Users\Admin\batch-processor\accuracy-report.json

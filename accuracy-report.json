@@ -1,0 +1,669 @@
+{
+  "results": [
+    {
+      "index": 0,
+      "testName": "Clean Arial 24pt",
+      "params": {
+        "name": "Clean Arial 24pt",
+        "font": "24px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quick brown fox jumps over the lazy dog.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.31898922390408,
+      "wordCount": 9,
+      "duration": 3231,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "sharpened",
+          "threshold"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 1,
+      "testName": "Clean Arial 24pt",
+      "params": {
+        "name": "Clean Arial 24pt",
+        "font": "24px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not to be that is the question.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 95.82108917236329,
+      "wordCount": 10,
+      "duration": 1843,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 2,
+      "testName": "Clean Arial 24pt",
+      "params": {
+        "name": "Clean Arial 24pt",
+        "font": "24px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty is a joy forever.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 95.47135925292969,
+      "wordCount": 8,
+      "duration": 1701,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 3,
+      "testName": "Low contrast",
+      "params": {
+        "name": "Low contrast",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 0.4
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quick brown fox jumps over the lazy dog.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.49338277180989,
+      "wordCount": 9,
+      "duration": 2725,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened",
+          "threshold"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 4,
+      "testName": "Low contrast",
+      "params": {
+        "name": "Low contrast",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 0.4
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not to be that is the question.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.58800964355468,
+      "wordCount": 10,
+      "duration": 1916,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 5,
+      "testName": "Low contrast",
+      "params": {
+        "name": "Low contrast",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 0.4
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty is a joy forever.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.4359941482544,
+      "wordCount": 8,
+      "duration": 1895,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 6,
+      "testName": "Noisy",
+      "params": {
+        "name": "Noisy",
+        "font": "22px Arial",
+        "noise": 30,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quick brown fox jumps over the lazy dog.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.54757351345486,
+      "wordCount": 9,
+      "duration": 2579,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "sharpened",
+          "threshold"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 7,
+      "testName": "Noisy",
+      "params": {
+        "name": "Noisy",
+        "font": "22px Arial",
+        "noise": 30,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not to be that is the question.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.46986846923828,
+      "wordCount": 10,
+      "duration": 1882,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 8,
+      "testName": "Noisy",
+      "params": {
+        "name": "Noisy",
+        "font": "22px Arial",
+        "noise": 30,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty is a joy forever.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 95.86098194122314,
+      "wordCount": 8,
+      "duration": 1938,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 9,
+      "testName": "Blurry (2px)",
+      "params": {
+        "name": "Blurry (2px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 2,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quack brown fox Ange over he Iazy Gog.\n",
+      "charErrorRate": 0.20930232558139536,
+      "wordErrorRate": 0.5555555555555556,
+      "charAccuracy": 79.06976744186046,
+      "wordAccuracy": 44.44444444444444,
+      "confidence": 54.35224914550781,
+      "wordCount": 9,
+      "duration": 4844,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur",
+          "deblur",
+          "threshold"
+        ],
+        "consensusAgreement": 0.9012605042016807
+      }
+    },
+    {
+      "index": 10,
+      "testName": "Blurry (2px)",
+      "params": {
+        "name": "Blurry (2px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 2,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not 10 be that is the question\n",
+      "charErrorRate": 0.05128205128205128,
+      "wordErrorRate": 0.1,
+      "charAccuracy": 94.87179487179486,
+      "wordAccuracy": 90,
+      "confidence": 90.81526794433594,
+      "wordCount": 10,
+      "duration": 2818,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 11,
+      "testName": "Blurry (2px)",
+      "params": {
+        "name": "Blurry (2px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 2,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty 1s a joy forever\n",
+      "charErrorRate": 0.029411764705882353,
+      "wordErrorRate": 0.125,
+      "charAccuracy": 97.05882352941177,
+      "wordAccuracy": 87.5,
+      "confidence": 78.06403350830078,
+      "wordCount": 8,
+      "duration": 4071,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur",
+          "deblur",
+          "threshold"
+        ],
+        "consensusAgreement": 0.9473684210526315
+      }
+    },
+    {
+      "index": 12,
+      "testName": "Blurry (3px)",
+      "params": {
+        "name": "Blurry (3px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 3,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The ut roan foe amps over Pe aly Sug\n",
+      "charErrorRate": 0.3488372093023256,
+      "wordErrorRate": 0.7777777777777778,
+      "charAccuracy": 65.11627906976744,
+      "wordAccuracy": 22.22222222222222,
+      "confidence": 56.391879611545136,
+      "wordCount": 9,
+      "duration": 5311,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur",
+          "deblur",
+          "threshold"
+        ],
+        "consensusAgreement": 0.5023361823361824
+      }
+    },
+    {
+      "index": 13,
+      "testName": "Blurry (3px)",
+      "params": {
+        "name": "Blurry (3px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 3,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not 10 be Pt 8 Pe gueston\n",
+      "charErrorRate": 0.28205128205128205,
+      "wordErrorRate": 0.5,
+      "charAccuracy": 71.7948717948718,
+      "wordAccuracy": 50,
+      "confidence": 40.219696807861325,
+      "wordCount": 10,
+      "duration": 3394,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur",
+          "threshold"
+        ],
+        "consensusAgreement": 0.39134693877551013
+      }
+    },
+    {
+      "index": 14,
+      "testName": "Blurry (3px)",
+      "params": {
+        "name": "Blurry (3px)",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 3,
+        "rotate": 0,
+        "contrast": 1
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A Pung of banty ® 0 py ever\n",
+      "charErrorRate": 0.4117647058823529,
+      "wordErrorRate": 0.75,
+      "charAccuracy": 58.82352941176471,
+      "wordAccuracy": 25,
+      "confidence": 40.29221487045288,
+      "wordCount": 8,
+      "duration": 4839,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "contrast",
+          "deblur",
+          "deblur",
+          "threshold"
+        ],
+        "consensusAgreement": 0.97
+      }
+    },
+    {
+      "index": 15,
+      "testName": "Rotated 180deg",
+      "params": {
+        "name": "Rotated 180deg",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 180,
+        "contrast": 1
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quick brown fox jumps over the lazy dog.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.36377716064453,
+      "wordCount": 9,
+      "duration": 2494,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "sharpened",
+          "threshold"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 16,
+      "testName": "Rotated 180deg",
+      "params": {
+        "name": "Rotated 180deg",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 180,
+        "contrast": 1
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not to be that is the question.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.51382064819336,
+      "wordCount": 10,
+      "duration": 1961,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 17,
+      "testName": "Rotated 180deg",
+      "params": {
+        "name": "Rotated 180deg",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 180,
+        "contrast": 1
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty is a joy forever.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.28859519958496,
+      "wordCount": 8,
+      "duration": 2175,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 18,
+      "testName": "Bright background",
+      "params": {
+        "name": "Bright background",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1,
+        "bgBright": true
+      },
+      "expectedPreview": "The quick brown fox jumps over the lazy dog.",
+      "actualPreview": "The quick brown fox jumps over the lazy dog.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.33838484022353,
+      "wordCount": 9,
+      "duration": 2745,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 2,
+        "strategies": [
+          "standard",
+          "sharpened",
+          "threshold"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 19,
+      "testName": "Bright background",
+      "params": {
+        "name": "Bright background",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1,
+        "bgBright": true
+      },
+      "expectedPreview": "To be or not to be that is the question.",
+      "actualPreview": "To be or not to be that is the question.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.54264297485352,
+      "wordCount": 10,
+      "duration": 2270,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    },
+    {
+      "index": 20,
+      "testName": "Bright background",
+      "params": {
+        "name": "Bright background",
+        "font": "22px Arial",
+        "noise": 0,
+        "blur": 0,
+        "rotate": 0,
+        "contrast": 1,
+        "bgBright": true
+      },
+      "expectedPreview": "A thing of beauty is a joy forever.",
+      "actualPreview": "A thing of beauty is a joy forever.\n",
+      "charErrorRate": 0,
+      "wordErrorRate": 0,
+      "charAccuracy": 100,
+      "wordAccuracy": 100,
+      "confidence": 96.1760606765747,
+      "wordCount": 8,
+      "duration": 1941,
+      "pipelineReport": {
+        "difficulty": "hard",
+        "iterations": 1,
+        "strategies": [
+          "standard",
+          "contrast",
+          "sharpened"
+        ],
+        "consensusAgreement": 1
+      }
+    }
+  ],
+  "avgCharAcc": 93.65405076759386,
+  "avgWordAcc": 86.62698412698413,
+  "avgDuration": 2789.190476190476,
+  "passed": 17,
+  "total": 21
+}
