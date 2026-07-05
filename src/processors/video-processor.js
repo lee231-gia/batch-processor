@@ -40,7 +40,7 @@ class VideoProcessor {
       try {
         video.currentTime = time;
         await new Promise((resolve, reject) => {
-          const to = setTimeout(() => reject(new Error('seek timeout')), 5000);
+          const to = setTimeout(() => reject(new Error('Video frame seek timed out after 5s at timestamp ' + time.toFixed(1) + 's. The video may be corrupted or in an unsupported format.')), 5000);
           video.onseeked = () => { clearTimeout(to); resolve(); };
         });
 

@@ -23,6 +23,14 @@ const STRATEGY_LABELS = {
   deblur: 'Deblur + threshold',
 };
 
+const ORIENT_THUMB_MAX_DIM = 800;
+const MAX_STRATEGIES = 3;
+const MAX_RETRY_STRATEGIES = 2;
+const TARGET_CONFIDENCE = 0.7;
+const MIN_IMPROVEMENT = 0.5;
+const LINE_TOLERANCE = 8;
+const OTSU_THRESHOLD_DEFAULT = 128;
+
 class OcrProcessor {
   constructor() {
     this.workers = [];
@@ -138,12 +146,10 @@ class OcrProcessor {
     const strategies = this._generateStrategies(quality);
     report.initialStrategies = strategies.map(s => s.name);
 
-    // Phase 4: Iterative extraction loop (max 2 iterations)
     let bestResult = null;
     let bestScore = -Infinity;
     let allCandidates = [];
     const maxIterations = quality.difficulty === 'hard' ? 2 : 1;
-    const targetConfidence = 0.7;
 
     for (let iteration = 0; iteration < maxIterations; iteration++) {
       const iterReport = { iteration, strategies: [], startTime: Date.now() };
@@ -205,14 +211,14 @@ class OcrProcessor {
       if (bestResult) {
         const critique = this._critique(bestResult, quality);
         report.lastCritique = critique;
-        if (critique.overallConfidence >= targetConfidence) {
+        if (critique.overallConfidence >= TARGET_CONFIDENCE) {
           report.stoppingReason = `Target confidence reached (${(critique.overallConfidence * 100).toFixed(0)}%)`;
           break;
         }
         if (iteration > 0) {
           const prevScore = report.iterations[iteration - 1].strategies.reduce((m, s) => Math.max(m, s.score), 0);
           report.improvement = bestScore - prevScore;
-          if (report.improvement < 0.5) {
+          if (report.improvement < MIN_IMPROVEMENT) {
             report.stoppingReason = `Improvement negligible (${report.improvement.toFixed(1)} pts)`;
             break;
           }
@@ -277,10 +283,9 @@ class OcrProcessor {
         const img = new Image();
         img.onload = () => {
           try {
-            const maxDim = 800;
             let w = img.width, h = img.height;
-            if (w <= maxDim && h <= maxDim) { resolve(imageData); return; }
-            const scale = Math.min(maxDim / w, maxDim / h, 1);
+            if (w <= ORIENT_THUMB_MAX_DIM && h <= ORIENT_THUMB_MAX_DIM) { resolve(imageData); return; }
+            const scale = Math.min(ORIENT_THUMB_MAX_DIM / w, ORIENT_THUMB_MAX_DIM / h, 1);
             w = Math.round(w * scale); h = Math.round(h * scale);
             const c = document.createElement('canvas');
             c.width = w; c.height = h;
@@ -460,7 +465,7 @@ class OcrProcessor {
     } else if (quality.isLowContrast) {
       strategies.push({ name: 'threshold', psm: 6 });
     }
-    if (strategies.length > 3) strategies.length = 3;
+    if (strategies.length > MAX_STRATEGIES) strategies.length = MAX_STRATEGIES;
     return strategies;
   }
 
@@ -472,7 +477,7 @@ class OcrProcessor {
     } else {
       strategies.push({ name: 'threshold', psm: 3 });
     }
-    if (strategies.length > 2) strategies.length = 2;
+    if (strategies.length > MAX_RETRY_STRATEGIES) strategies.length = MAX_RETRY_STRATEGIES;
     return strategies;
   }
 
@@ -522,53 +527,42 @@ class OcrProcessor {
     });
   }
 
+  _applyContrastToPixels(pixels, mean, std, maxFactor, targetStd) {
+    const factor = Math.min(maxFactor, targetStd / Math.max(std, 1));
+    for (let i = 0; i < pixels.length; i += 4) {
+      let v = (pixels[i] - mean) * factor + 128;
+      pixels[i] = pixels[i+1] = pixels[i+2] = Math.max(0, Math.min(255, v));
+    }
+  }
+
   async _applyStandard(imageData) {
     const px = await this._pixelsFromImage(imageData);
     if (!px) return imageData;
-    const { mean, std, canvas, d } = px;
-    if ((mean < 30 || mean > 225 || std < 25) && std > 1) {
-      const factor = Math.min(1.25, 60 / std);
-      for (let i = 0; i < d.data.length; i += 4) {
-        let v = (d.data[i] - mean) * factor + 128;
-        d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
-      }
-      px.ctx.putImageData(d, 0, 0);
+    if ((px.mean < 30 || px.mean > 225 || px.std < 25) && px.std > 1) {
+      this._applyContrastToPixels(px.d.data, px.mean, px.std, 1.25, 60);
+      px.ctx.putImageData(px.d, 0, 0);
     }
-    return canvas.toDataURL('image/png');
+    return px.canvas.toDataURL('image/png');
   }
 
   async _applyContrast(imageData) {
     const px = await this._pixelsFromImage(imageData);
     if (!px) return imageData;
-    const { mean, std, canvas, d } = px;
-    const factor = Math.min(2, 80 / Math.max(std, 1));
-    for (let i = 0; i < d.data.length; i += 4) {
-      let v = (d.data[i] - mean) * factor + 128;
-      d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
-    }
-    px.ctx.putImageData(d, 0, 0);
-    return canvas.toDataURL('image/png');
+    this._applyContrastToPixels(px.d.data, px.mean, px.std, 2, 80);
+    px.ctx.putImageData(px.d, 0, 0);
+    return px.canvas.toDataURL('image/png');
   }
 
   async _applySharpened(imageData) {
     const px = await this._pixelsFromImage(imageData);
     if (!px) return imageData;
 
-    // First enhance contrast
-    const { mean, std, canvas, d, width, height } = px;
-    const factor = Math.min(1.5, 70 / Math.max(std, 1));
-    const src = new Float32Array(d.data.length);
-    for (let i = 0; i < d.data.length; i += 4) {
-      let v = (d.data[i] - mean) * factor + 128;
-      d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
-      src[i] = d.data[i];
-    }
+    const { width, height } = px;
+    this._applyContrastToPixels(px.d.data, px.mean, px.std, 1.5, 70);
 
-    // Unsharp mask: stronger 3x3 kernel [0 -1 0; -1 9 -1; 0 -1 0]
-    // Applied twice for cumulative effect
     for (let pass = 0; pass < 2; pass++) {
-      const input = new Float32Array(d.data.length);
-      for (let i = 0; i < d.data.length; i++) input[i] = d.data[i];
+      const input = new Float32Array(px.d.data.length);
+      for (let i = 0; i < px.d.data.length; i++) input[i] = px.d.data[i];
       for (let y = 1; y < height - 1; y++) {
         for (let x = 1; x < width - 1; x++) {
           const i = (y * width + x) * 4;
@@ -577,33 +571,25 @@ class OcrProcessor {
             - input[i - 4] - input[i + 4]
             - input[i - width * 4] - input[i + width * 4]
           );
-          d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
+          px.d.data[i] = px.d.data[i+1] = px.d.data[i+2] = Math.max(0, Math.min(255, v));
         }
       }
     }
-    px.ctx.putImageData(d, 0, 0);
-    return canvas.toDataURL('image/png');
+    px.ctx.putImageData(px.d, 0, 0);
+    return px.canvas.toDataURL('image/png');
   }
 
-  async _applyThreshold(imageData) {
-    const px = await this._pixelsFromImage(imageData);
-    if (!px) return imageData;
-
-    const { canvas, d, total } = px;
+  _otsuThreshold(pixels, total) {
     const histogram = new Uint32Array(256);
-    for (let i = 0; i < d.data.length; i += 4) {
-      histogram[d.data[i]]++;
+    for (let i = 0; i < pixels.length; i += 4) {
+      histogram[pixels[i]]++;
     }
-
-    // Otsu threshold
-    let sumB = 0, wB = 0, maxVariance = 0, threshold = 128;
+    let wB = 0, sumB = 0, maxVariance = 0, threshold = OTSU_THRESHOLD_DEFAULT;
     const sumTotal = histogram.reduce((a, v, i) => a + i * v, 0);
-    let wF = total;
-    let sumF = sumTotal;
     for (let t = 0; t < 256; t++) {
       wB += histogram[t];
       if (wB === 0) continue;
-      wF = total - wB;
+      const wF = total - wB;
       if (wF === 0) break;
       sumB += t * histogram[t];
       const mB = sumB / wB;
@@ -611,13 +597,23 @@ class OcrProcessor {
       const between = wB * wF * (mB - mF) * (mB - mF);
       if (between > maxVariance) { maxVariance = between; threshold = t; }
     }
+    return threshold;
+  }
 
-    for (let i = 0; i < d.data.length; i += 4) {
-      const v = d.data[i] < threshold ? 0 : 255;
-      d.data[i] = d.data[i+1] = d.data[i+2] = v;
+  _applyBinarize(pixels, threshold) {
+    for (let i = 0; i < pixels.length; i += 4) {
+      const v = pixels[i] < threshold ? 0 : 255;
+      pixels[i] = pixels[i+1] = pixels[i+2] = v;
     }
-    px.ctx.putImageData(d, 0, 0);
-    return canvas.toDataURL('image/png');
+  }
+
+  async _applyThreshold(imageData) {
+    const px = await this._pixelsFromImage(imageData);
+    if (!px) return imageData;
+    const threshold = this._otsuThreshold(px.d.data, px.total);
+    this._applyBinarize(px.d.data, threshold);
+    px.ctx.putImageData(px.d, 0, 0);
+    return px.canvas.toDataURL('image/png');
   }
 
   async _applyUpscaled(imageData) {
@@ -636,20 +632,17 @@ class OcrProcessor {
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // Then apply light contrast
     const d = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const upPixels = d.data;
+    const upTotal = canvas.width * canvas.height;
     let sum = 0, sumSq = 0;
-    for (let i = 0; i < d.data.length; i += 4) {
-      const g = d.data[i]; sum += g; sumSq += g * g;
+    for (let i = 0; i < upPixels.length; i += 4) {
+      const g = upPixels[i]; sum += g; sumSq += g * g;
     }
-    const m = sum / (d.data.length / 4);
-    const s = Math.sqrt(sumSq / (d.data.length / 4) - m * m);
-    if (s < 40 && s > 1) {
-      const f = Math.min(1.3, 60 / s);
-      for (let i = 0; i < d.data.length; i += 4) {
-        let v = (d.data[i] - m) * f + 128;
-        d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
-      }
+    const upMean = sum / upTotal;
+    const upStd = Math.sqrt(sumSq / upTotal - upMean * upMean);
+    if (upStd < 40 && upStd > 1) {
+      this._applyContrastToPixels(upPixels, upMean, upStd, 1.3, 60);
       ctx.putImageData(d, 0, 0);
     }
     return canvas.toDataURL('image/png');
@@ -685,46 +678,17 @@ class OcrProcessor {
     const px = await this._pixelsFromImage(imageData);
     if (!px) return imageData;
 
-    const { canvas, d, width, height } = px;
-    const total = width * height;
-
-    // Strong contrast + threshold
     let sum = 0, sumSq = 0;
-    for (let i = 0; i < d.data.length; i += 4) {
-      sum += d.data[i]; sumSq += d.data[i] * d.data[i];
+    for (let i = 0; i < px.d.data.length; i += 4) {
+      sum += px.d.data[i]; sumSq += px.d.data[i] * px.d.data[i];
     }
-    const m = sum / total;
-    const s = Math.sqrt(sumSq / total - m * m);
-    const factor = Math.min(2.5, 100 / Math.max(s, 1));
-
-    // Apply contrast then Otsu threshold
-    for (let i = 0; i < d.data.length; i += 4) {
-      let v = (d.data[i] - m) * factor + 128;
-      d.data[i] = d.data[i+1] = d.data[i+2] = Math.max(0, Math.min(255, v));
-    }
-
-    // Otsu on enhanced image
-    const hist = new Uint32Array(256);
-    for (let i = 0; i < d.data.length; i += 4) hist[d.data[i]]++;
-    let wB = 0, sumB = 0, bestT = 128, bestV = 0;
-    const sumTotal = hist.reduce((a, v, i) => a + i * v, 0);
-    for (let t = 0; t < 256; t++) {
-      wB += hist[t];
-      if (wB === 0) continue;
-      sumB += t * hist[t];
-      const wF = total - wB;
-      if (wF === 0) break;
-      const mB = sumB / wB, mF = (sumTotal - sumB) / wF;
-      const bv = wB * wF * (mB - mF) * (mB - mF);
-      if (bv > bestV) { bestV = bv; bestT = t; }
-    }
-
-    for (let i = 0; i < d.data.length; i += 4) {
-      const v = d.data[i] < bestT ? 0 : 255;
-      d.data[i] = d.data[i+1] = d.data[i+2] = v;
-    }
-    px.ctx.putImageData(d, 0, 0);
-    return canvas.toDataURL('image/png');
+    const m = sum / px.total;
+    const s = Math.sqrt(sumSq / px.total - m * m);
+    this._applyContrastToPixels(px.d.data, m, s, 2.5, 100);
+    const threshold = this._otsuThreshold(px.d.data, px.total);
+    this._applyBinarize(px.d.data, threshold);
+    px.ctx.putImageData(px.d, 0, 0);
+    return px.canvas.toDataURL('image/png');
   }
 
   async _applyDeblur(imageData) {
@@ -764,28 +728,8 @@ class OcrProcessor {
       }
     }
 
-    // Otsu threshold
-    const total = upW * upH;
-    const hist = new Uint32Array(256);
-    for (let i = 0; i < upD.length; i += 4) hist[upD[i]]++;
-    let wB = 0, sumB = 0, bestT = 128, bestV = 0;
-    const sumTotal = hist.reduce((a, v, i) => a + i * v, 0);
-    for (let t = 0; t < 256; t++) {
-      wB += hist[t];
-      if (wB === 0) continue;
-      sumB += t * hist[t];
-      const wF = total - wB;
-      if (wF === 0) break;
-      const mB = sumB / wB;
-      const mF = (sumTotal - sumB) / wF;
-      const bv = wB * wF * (mB - mF) * (mB - mF);
-      if (bv > bestV) { bestV = bv; bestT = t; }
-    }
-
-    for (let i = 0; i < upD.length; i += 4) {
-      const v = upD[i] < bestT ? 0 : 255;
-      upD[i] = upD[i+1] = upD[i+2] = v;
-    }
+    const threshold = this._otsuThreshold(upD, upW * upH);
+    this._applyBinarize(upD, threshold);
     ctx.putImageData(d, 0, 0);
 
     return canvas.toDataURL('image/png');

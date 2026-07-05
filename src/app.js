@@ -718,6 +718,7 @@
     const processing = files.filter(f => f.status === 'processing').length;
     const done = files.filter(f => f.status === 'done').length;
     const errors = files.filter(f => f.status === 'error').length;
+    if (errors > 0) logError('Processing completed with ' + errors + ' error(s) out of ' + files.length + ' file(s)', null);
 
     if (isProcessing) {
       const elapsed = Date.now() - processingStartTime;
@@ -817,8 +818,8 @@
           updateOutputText();
         } catch (err) {
           f.status = 'error';
-          f.error = err.message || 'Unknown error';
-          f.pipelineStages.push({ name: 'Failed: ' + String(f.error).substring(0, 40), status: 'error' });
+          f.error = err.message || 'Processing failed — no error details available';
+          f.pipelineStages.push({ name: 'Failed: ' + String(f.error).substring(0, 60), status: 'error' });
         }
 
         updateFileItem(f.id);
@@ -901,7 +902,7 @@
       case 'video': return processVideoFile(f, onProgress);
       case 'text': return processTextFile(f);
       case 'link': return processLink(f);
-      default: throw new Error('Unsupported file type');
+      default: throw new Error('Unsupported file type "' + (f.type || 'unknown') + '" for file "' + f.name + '". Supported types: img, audio, video, text, link.');
     }
   }
 
@@ -1014,6 +1015,10 @@
   /* ══════════════════════════════════════════════════════════════
      COPY / EXPORT
      ══════════════════════════════════════════════════════════════ */
+
+  function logError(context, err) {
+    console.error(`[${new Date().toISOString()}] ${context}:`, err);
+  }
 
   async function copySelected() {
     const filesToCopy = files.filter(f => selectedIds.has(f.id) && f.result);

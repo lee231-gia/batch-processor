@@ -186,9 +186,9 @@ function fetchUrlContent(url) {
           statusCode: res.statusCode,
         });
       });
-    }).on('error', reject).on('timeout', function() {
+    }).on('error', (e) => reject(new Error('Failed to fetch ' + url + ': ' + e.message))).on('timeout', function() {
       this.destroy();
-      reject(new Error('Request timed out'));
+      reject(new Error('Request to ' + url + ' timed out after 15s. The server may be unreachable or too slow.'));
     });
   });
 }
