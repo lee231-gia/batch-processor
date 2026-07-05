@@ -42,8 +42,11 @@ function createWindow() {
   });
 
   mainWindow.on('closed', () => { mainWindow = null; });
+  mainWindow.webContents.on('crashed', () => { console.error('Renderer crashed'); });
+  mainWindow.webContents.on('render-process-gone', (event, details) => { console.error('Render process gone:', details.reason); });
 }
 
+app.disableHardwareAcceleration();
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
