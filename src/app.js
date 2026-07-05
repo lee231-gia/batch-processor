@@ -121,9 +121,14 @@
   dropZone.addEventListener('click', () => fileInput.click());
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-  dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files); });
+  dropZone.addEventListener('drop', (e) => { 
+    e.preventDefault(); dropZone.classList.remove('drag-over'); 
+    try { handleFiles(e.dataTransfer.files); } catch (err) { console.error('Drop error:', err); setStatus('Error adding files: ' + err.message); }
+  });
   fileInput.addEventListener('change', () => {
-    if (fileInput.files) { handleFiles(fileInput.files); fileInput.value = ''; }
+    try {
+      if (fileInput.files) { handleFiles(fileInput.files); fileInput.value = ''; }
+    } catch (err) { console.error('File input error:', err); setStatus('Error adding files: ' + err.message); }
   });
 
   settingsBtn.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
@@ -424,9 +429,11 @@
       fileList.appendChild(div);
     }
 
-    document.querySelectorAll('.file-list .file-item .preview').forEach(img => {
-      if (img.tagName === 'IMG') img.addEventListener('load', () => URL.revokeObjectURL(img.src));
-    });
+    try {
+      document.querySelectorAll('.file-list .file-item .preview').forEach(img => {
+        if (img.tagName === 'IMG') img.addEventListener('load', () => { try { URL.revokeObjectURL(img.src); } catch (_) {} });
+      });
+    } catch (_) {}
 
     setupFileItemEvents();
   }
@@ -1187,6 +1194,16 @@
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  /* ── Global error handler ── */
+  window.addEventListener('error', (e) => {
+    console.error('[CRASH] Uncaught error:', e.error || e.message);
+    setStatus('Error: ' + (e.error?.message || e.message || 'Unknown'));
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[CRASH] Unhandled rejection:', e.reason);
+    setStatus('Error: ' + (e.reason?.message || 'Unhandled promise rejection'));
+  });
 
   /* ── Periodic status update ── */
   setInterval(updateStatusBar, 1000);
