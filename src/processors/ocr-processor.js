@@ -23,13 +23,12 @@ const STRATEGY_LABELS = {
   deblur: 'Deblur + threshold',
 };
 
-const ORIENT_THUMB_MAX_DIM = 800;
-const MAX_STRATEGIES = 3;
-const MAX_RETRY_STRATEGIES = 2;
-const TARGET_CONFIDENCE = 0.7;
-const MIN_IMPROVEMENT = 0.5;
-const LINE_TOLERANCE = 8;
-const OTSU_THRESHOLD_DEFAULT = 128;
+const OCR_OCR_ORIENT_THUMB_MAX_DIM = 800;
+const OCR_OCR_MAX_STRATEGIES = 3;
+const OCR_OCR_MAX_RETRY_STRATEGIES = 2;
+const OCR_OCR_TARGET_CONFIDENCE = 0.7;
+const OCR_OCR_MIN_IMPROVEMENT = 0.5;
+const OCR_OCR_OTSU_THRESHOLD_DEFAULT = 128;
 
 class OcrProcessor {
   constructor() {
@@ -211,14 +210,14 @@ class OcrProcessor {
       if (bestResult) {
         const critique = this._critique(bestResult, quality);
         report.lastCritique = critique;
-        if (critique.overallConfidence >= TARGET_CONFIDENCE) {
+        if (critique.overallConfidence >= OCR_TARGET_CONFIDENCE) {
           report.stoppingReason = `Target confidence reached (${(critique.overallConfidence * 100).toFixed(0)}%)`;
           break;
         }
         if (iteration > 0) {
           const prevScore = report.iterations[iteration - 1].strategies.reduce((m, s) => Math.max(m, s.score), 0);
           report.improvement = bestScore - prevScore;
-          if (report.improvement < MIN_IMPROVEMENT) {
+          if (report.improvement < OCR_MIN_IMPROVEMENT) {
             report.stoppingReason = `Improvement negligible (${report.improvement.toFixed(1)} pts)`;
             break;
           }
@@ -284,8 +283,8 @@ class OcrProcessor {
         img.onload = () => {
           try {
             let w = img.width, h = img.height;
-            if (w <= ORIENT_THUMB_MAX_DIM && h <= ORIENT_THUMB_MAX_DIM) { resolve(imageData); return; }
-            const scale = Math.min(ORIENT_THUMB_MAX_DIM / w, ORIENT_THUMB_MAX_DIM / h, 1);
+            if (w <= OCR_ORIENT_THUMB_MAX_DIM && h <= OCR_ORIENT_THUMB_MAX_DIM) { resolve(imageData); return; }
+            const scale = Math.min(OCR_ORIENT_THUMB_MAX_DIM / w, OCR_ORIENT_THUMB_MAX_DIM / h, 1);
             w = Math.round(w * scale); h = Math.round(h * scale);
             const c = document.createElement('canvas');
             c.width = w; c.height = h;
@@ -465,7 +464,7 @@ class OcrProcessor {
     } else if (quality.isLowContrast) {
       strategies.push({ name: 'threshold', psm: 6 });
     }
-    if (strategies.length > MAX_STRATEGIES) strategies.length = MAX_STRATEGIES;
+    if (strategies.length > OCR_MAX_STRATEGIES) strategies.length = OCR_MAX_STRATEGIES;
     return strategies;
   }
 
@@ -477,7 +476,7 @@ class OcrProcessor {
     } else {
       strategies.push({ name: 'threshold', psm: 3 });
     }
-    if (strategies.length > MAX_RETRY_STRATEGIES) strategies.length = MAX_RETRY_STRATEGIES;
+    if (strategies.length > OCR_MAX_RETRY_STRATEGIES) strategies.length = OCR_MAX_RETRY_STRATEGIES;
     return strategies;
   }
 
@@ -584,7 +583,7 @@ class OcrProcessor {
     for (let i = 0; i < pixels.length; i += 4) {
       histogram[pixels[i]]++;
     }
-    let wB = 0, sumB = 0, maxVariance = 0, threshold = OTSU_THRESHOLD_DEFAULT;
+    let wB = 0, sumB = 0, maxVariance = 0, threshold = OCR_OTSU_THRESHOLD_DEFAULT;
     const sumTotal = histogram.reduce((a, v, i) => a + i * v, 0);
     for (let t = 0; t < 256; t++) {
       wB += histogram[t];

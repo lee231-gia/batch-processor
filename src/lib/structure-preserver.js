@@ -1,10 +1,10 @@
-const LINE_TOLERANCE = 8;
-const COLUMN_GAP_THRESHOLD = 0.15;
-const COLUMN_GAP_MIN = 0.08;
-const PARA_LINE_HEIGHT_FACTOR = 1.5;
-const FORMAT_CHAR_WIDTH_DIV = 80;
-const FORMAT_MAX_INDENT = 8;
-const MARKDOWN_INDENT_THRESHOLD = 0.15;
+const SP_SP_LINE_TOLERANCE = 8;
+const SP_SP_COLUMN_GAP_THRESHOLD = 0.15;
+const SP_SP_COLUMN_GAP_MIN = 0.08;
+const SP_SP_PARA_LINE_HEIGHT_FACTOR = 1.5;
+const SP_SP_FORMAT_CHAR_WIDTH_DIV = 80;
+const SP_SP_FORMAT_MAX_INDENT = 8;
+const SP_SP_MARKDOWN_INDENT_THRESHOLD = 0.15;
 
 class StructurePreserver {
   reconstructLayout(words, mode = 'formatted') {
@@ -38,7 +38,7 @@ class StructurePreserver {
       const prev = currentLine[currentLine.length - 1];
       const yDiff = Math.abs(word.bbox.y0 - prev.bbox.y0);
 
-      if (yDiff <= LINE_TOLERANCE) {
+      if (yDiff <= SP_LINE_TOLERANCE) {
         currentLine.push(word);
       } else {
         lines.push(currentLine);
@@ -75,11 +75,11 @@ class StructurePreserver {
       return Math.max(max, last.bbox.x1);
     }, 0);
 
-    if (maxGap < pageWidth * COLUMN_GAP_THRESHOLD) {
+    if (maxGap < pageWidth * SP_COLUMN_GAP_THRESHOLD) {
       return { count: 1, boundaries: [0] };
     }
 
-    const significantGaps = allXGaps.filter(g => g > pageWidth * COLUMN_GAP_MIN);
+    const significantGaps = allXGaps.filter(g => g > pageWidth * SP_COLUMN_GAP_MIN);
     significantGaps.sort((a, b) => a - b);
 
     const colEdges = new Set();
@@ -90,7 +90,7 @@ class StructurePreserver {
       const last = line[line.length - 1];
       for (let i = 1; i < line.length; i++) {
         const gap = line[i].bbox.x0 - line[i - 1].bbox.x1;
-        if (gap > pageWidth * COLUMN_GAP_MIN) {
+        if (gap > pageWidth * SP_COLUMN_GAP_MIN) {
           colEdges.add(line[i].bbox.x0 - gap / 2);
         }
       }
@@ -114,7 +114,7 @@ class StructurePreserver {
       const gap = currFirst.bbox.y0 - prevLast.bbox.y1;
 
       const avgLineHeight = (prevLast.bbox.y1 - prevLast.bbox.y0 + currFirst.bbox.y1 - currFirst.bbox.y0) / 2;
-      const yThreshold = avgLineHeight * PARA_LINE_HEIGHT_FACTOR;
+      const yThreshold = avgLineHeight * SP_PARA_LINE_HEIGHT_FACTOR;
 
       if (gap > yThreshold) {
         paragraphs.push(currentPara);
@@ -147,7 +147,7 @@ class StructurePreserver {
     const pageWidth = this._findPageWidth(lines);
     if (pageWidth === 0) return '';
 
-    const charWidth = pageWidth / FORMAT_CHAR_WIDTH_DIV;
+    const charWidth = pageWidth / SP_FORMAT_CHAR_WIDTH_DIV;
     const output = [];
 
     for (const paragraph of paragraphs) {
@@ -156,7 +156,7 @@ class StructurePreserver {
         const textLine = line.map(w => w.text).join(' ');
         const indent = this._getIndent(line);
         const indentSpaces = indent > 0 ? Math.round(indent / charWidth) : 0;
-        const indentStr = ' '.repeat(Math.min(indentSpaces, FORMAT_MAX_INDENT));
+        const indentStr = ' '.repeat(Math.min(indentSpaces, SP_FORMAT_MAX_INDENT));
         paraLines.push(indentStr + textLine);
       }
       output.push(paraLines.join('\n'));
@@ -178,7 +178,7 @@ class StructurePreserver {
       for (const line of paragraph) {
         const text = line.map(w => w.text).join(' ');
         const indent = this._getIndent(line);
-        if (indent > pageWidth * MARKDOWN_INDENT_THRESHOLD) {
+        if (indent > pageWidth * SP_MARKDOWN_INDENT_THRESHOLD) {
           paraLines.push('  ' + text);
         } else {
           if (paraLines.length === 0 && line.length > 0) {
